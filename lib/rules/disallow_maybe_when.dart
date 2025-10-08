@@ -29,7 +29,7 @@ class DisallowMaybeWhen extends DartLintRule {
         return;
       }
       final enclosing = element.enclosingElement;
-      if (!(enclosing is ExtensionElement)) {
+      if (enclosing is! ExtensionElement) {
         return;
       }
       final className = enclosing.extendedType.element?.name;
