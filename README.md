@@ -180,3 +180,38 @@ is registered in `WxLintsPlugin.register`.
 isolate. If the plugin misbehaves, check the analyzer diagnostics pages
 (**Dart: Open Analyzer Diagnostics** in VS Code) for the plugin's status and any
 crash output.
+
+### Testing
+
+Each rule has a test suite under `test/rules/`, built on `package:analyzer_testing`'s
+`AnalysisRuleTest` harness. It resolves a snippet of Dart source in-memory,
+registers the rule under test, and asserts exactly which diagnostics are
+reported (and at which offsets):
+
+```dart
+@reflectiveTest
+class DisallowMaybeWhenTest extends AnalysisRuleTest {
+  @override
+  void setUp() {
+    rule = DisallowMaybeWhen();
+    super.setUp();
+  }
+
+  Future<void> test_flags_fragment_maybeWhen() async {
+    await assertDiagnostics(content, [lint(offset, length)]);
+  }
+}
+```
+
+Run the suite with:
+
+```sh
+dart test
+```
+
+Tests cover each rule's detection logic (positive, negative, and edge cases)
+against minimal local stub classes, so they don't depend on real Flutter or
+GraphQL codegen output. They don't cover the exact rewritten output of each
+quick fix, since there's no stable public harness for invoking a
+`ResolvedCorrectionProducer` outside the Dart SDK's own analysis_server test
+infrastructure.
